@@ -19,6 +19,7 @@ package android.widget;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Build;
+import android.os.PowerManager;
 import android.util.FloatMath;
 import android.view.ViewConfiguration;
 import android.view.animation.AnimationUtils;
@@ -26,11 +27,39 @@ import android.view.animation.Interpolator;
 
 
 /**
- * This class encapsulates scrolling.  The duration of the scroll
- * can be passed in the constructor and specifies the maximum time that
- * the scrolling animation should take.  Past this time, the scrolling is 
- * automatically moved to its final stage and computeScrollOffset()
- * will always return false to indicate that scrolling is over.
+ * <p>This class encapsulates scrolling. You can use scrollers ({@link Scroller}
+ * or {@link OverScroller}) to collect the data you need to produce a scrolling
+ * animation&mdash;for example, in response to a fling gesture. Scrollers track
+ * scroll offsets for you over time, but they don't automatically apply those
+ * positions to your view. It's your responsibility to get and apply new
+ * coordinates at a rate that will make the scrolling animation look smooth.</p>
+ *
+ * <p>Here is a simple example:</p>
+ *
+ * <pre> private Scroller mScroller = new Scroller(context);
+ * ...
+ * public void zoomIn() {
+ *     // Revert any animation currently in progress
+ *     mScroller.forceFinished(true);
+ *     // Start scrolling by providing a starting point and
+ *     // the distance to travel
+ *     mScroller.startScroll(0, 0, 100, 0);
+ *     // Invalidate to request a redraw
+ *     invalidate();
+ * }</pre>
+ *
+ * <p>To track the changing positions of the x/y coordinates, use
+ * {@link #computeScrollOffset}. The method returns a boolean to indicate
+ * whether the scroller is finished. If it isn't, it means that a fling or
+ * programmatic pan operation is still in progress. You can use this method to
+ * find the current offsets of the x and y coordinates, for example:</p>
+ *
+ * <pre>if (mScroller.computeScrollOffset()) {
+ *     // Get current x and y positions
+ *     int currX = mScroller.getCurrX();
+ *     int currY = mScroller.getCurrY();
+ *    ...
+ * }</pre>
  */
 public class Scroller  {
     private int mMode;
@@ -82,6 +111,8 @@ public class Scroller  {
 
     // A context-specific coefficient adjusted to physical values.
     private float mPhysicalCoeff;
+
+    private final PowerManager mPm;
 
     static {
         float x_min = 0.0f;
@@ -156,6 +187,7 @@ public class Scroller  {
         mFlywheel = flywheel;
 
         mPhysicalCoeff = computeDeceleration(0.84f); // look and feel tuning
+        mPm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
     }
 
     /**
@@ -272,8 +304,7 @@ public class Scroller  {
 
     /**
      * Call this when you want to know the new location.  If it returns true,
-     * the animation is not yet finished.  loc will be altered to provide the
-     * new location.
+     * the animation is not yet finished.
      */ 
     public boolean computeScrollOffset() {
         if (mFinished) {
@@ -355,7 +386,8 @@ public class Scroller  {
     }
 
     /**
-     * Start scrolling by providing a starting point and the distance to travel.
+     * Start scrolling by providing a starting point, the distance to travel,
+     * and the duration of the scroll.
      * 
      * @param startX Starting horizontal scroll offset in pixels. Positive
      *        numbers will scroll the content to the left.
@@ -379,6 +411,7 @@ public class Scroller  {
         mDeltaX = dx;
         mDeltaY = dy;
         mDurationReciprocal = 1.0f / (float) mDuration;
+        mPm.cpuBoost(1500000);
     }
 
     /**

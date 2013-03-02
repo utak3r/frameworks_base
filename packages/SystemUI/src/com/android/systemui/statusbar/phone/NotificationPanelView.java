@@ -39,7 +39,7 @@ public class NotificationPanelView extends PanelView {
     private static final float STATUS_BAR_SETTINGS_FLIP_PERCENTAGE_LEFT = 0.85f;
 
     Drawable mHandleBar;
-    float mHandleBarHeight;
+    int mHandleBarHeight;
     View mHandleView;
     int mFingers;
     PhoneStatusBar mStatusBar;
@@ -48,6 +48,7 @@ public class NotificationPanelView extends PanelView {
     int mFastTogglePos;
     ContentObserver mEnableObserver;
     ContentObserver mChangeSideObserver;
+    int mToggleStyle;
     Handler mHandler = new Handler();
 
     public NotificationPanelView(Context context, AttributeSet attrs) {
@@ -64,7 +65,7 @@ public class NotificationPanelView extends PanelView {
 
         Resources resources = getContext().getResources();
         mHandleBar = resources.getDrawable(R.drawable.status_bar_close);
-        mHandleBarHeight = resources.getDimension(R.dimen.close_handle_height);
+        mHandleBarHeight = resources.getDimensionPixelSize(R.dimen.close_handle_height);
         mHandleView = findViewById(R.id.handle);
 
         setContentDescription(resources.getString(
@@ -76,6 +77,8 @@ public class NotificationPanelView extends PanelView {
             public void onChange(boolean selfChange) {
                 mFastToggleEnabled = Settings.System.getBoolean(resolver,
                         Settings.System.FAST_TOGGLE, false);
+                mToggleStyle = Settings.System.getInt(resolver,
+                        Settings.System.TOGGLES_STYLE, 0);
             }
         };
 
@@ -92,14 +95,26 @@ public class NotificationPanelView extends PanelView {
                 Settings.System.FAST_TOGGLE, false);
         mFastTogglePos = Settings.System.getInt(resolver,
                 Settings.System.CHOOSE_FASTTOGGLE_SIDE, 1);
+        mToggleStyle = Settings.System.getInt(resolver,
+                Settings.System.TOGGLES_STYLE, 0);
 
         resolver.registerContentObserver(
                 Settings.System.getUriFor(Settings.System.FAST_TOGGLE),
+                true, mEnableObserver);
+        resolver.registerContentObserver(
+                Settings.System.getUriFor(Settings.System.TOGGLES_STYLE),
                 true, mEnableObserver);
 
         resolver.registerContentObserver(
                 Settings.System.getUriFor(Settings.System.CHOOSE_FASTTOGGLE_SIDE),
                 true, mChangeSideObserver);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        getContext().getContentResolver().unregisterContentObserver(mEnableObserver);
+        getContext().getContentResolver().unregisterContentObserver(mChangeSideObserver);
+        super.onDetachedFromWindow();
     }
 
     @Override
@@ -145,6 +160,11 @@ public class NotificationPanelView extends PanelView {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     mOkToFlip = getExpandedHeight() == 0;
+                    if(mToggleStyle != 0) {
+                        // don't allow settings panel with non-tile toggles
+                        shouldFlip = false;
+                        break;
+                    }
                     if (mFastTogglePos == 1) {
                         if ((event.getX(0) > getWidth()
                                 * (1.0f - STATUS_BAR_SETTINGS_FLIP_PERCENTAGE_RIGHT)

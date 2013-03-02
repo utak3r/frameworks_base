@@ -52,6 +52,9 @@ public class SignalClusterView
     private boolean mIsAirplaneMode = false;
     private int mAirplaneIconId = 0;
     private String mWifiDescription, mMobileDescription, mMobileTypeDescription;
+    private static final int STYLE_HIDE = 0;
+    private static final int STYLE_SHOW = 1;
+    private static final int STYLE_SHOW_DBM = 2;
 
     private boolean showingSignalText = false;
     private boolean showingWiFiText = false;
@@ -64,6 +67,8 @@ public class SignalClusterView
 
     Handler mHandler;
 
+    private SettingsObserver mSettingsObserver;
+
     public SignalClusterView(Context context) {
         this(context, null);
     }
@@ -74,6 +79,7 @@ public class SignalClusterView
 
     public SignalClusterView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        mSettingsObserver = new SettingsObserver(mHandler);
     }
 
     public void setNetworkController(NetworkController nc) {
@@ -99,8 +105,7 @@ public class SignalClusterView
 
         mHandler = new Handler();
 
-        SettingsObserver settingsObserver = new SettingsObserver(mHandler);
-        settingsObserver.observe();
+        mSettingsObserver.observe();
 
         apply();
     }
@@ -118,6 +123,8 @@ public class SignalClusterView
         mWiFiText       = null;
         mSpacer         = null;
         mAirplane       = null;
+
+        mContext.getContentResolver().unregisterContentObserver(mSettingsObserver);
 
         super.onDetachedFromWindow();
     }
@@ -264,11 +271,11 @@ public class SignalClusterView
     protected void updateSettings() {
         ContentResolver resolver = mContext.getContentResolver();
 
+        showingSignalText = (Settings.System.getInt(resolver,
+                Settings.System.STATUSBAR_SIGNAL_TEXT,STYLE_HIDE) > 0);
+        showingWiFiText = Settings.System.getInt(resolver,
+                Settings.System.STATUSBAR_WIFI_SIGNAL_TEXT, 0) != 0;
         boolean clustdefault = getResources().getBoolean(R.bool.statusbar_alt_signal_layout);
-        showingSignalText = Settings.System.getBoolean(resolver,
-                Settings.System.STATUSBAR_SIGNAL_TEXT, false);
-        showingWiFiText = Settings.System.getBoolean(resolver,
-                Settings.System.STATUSBAR_WIFI_SIGNAL_TEXT, false);
         showingAltCluster = Settings.System.getBoolean(resolver,
                 Settings.System.STATUSBAR_SIGNAL_CLUSTER_ALT, clustdefault);
         apply();

@@ -177,7 +177,6 @@ public class TabletStatusBar extends BaseStatusBar implements
     int mNotificationPeekTapDuration;
     int mNotificationFlingVelocity;
 
-
     BluetoothController mBluetoothController;
     LocationController mLocationController;
     NetworkController mNetworkController;
@@ -214,7 +213,6 @@ public class TabletStatusBar extends BaseStatusBar implements
     private int doubleClickCounter = 0;
     public String[] mClockActions = new String[3];
     private boolean mClockDoubleClicked;
-    private AwesomeAction mAwesomeAction;
     private View mDateTimeView;
 
     public Context getContext() { return mContext; }
@@ -253,7 +251,7 @@ public class TabletStatusBar extends BaseStatusBar implements
     CustomTheme mCurrentTheme;
     private boolean mRecreating = false;
 
-    
+
     protected void addPanelWindows() {
         final Context context = mContext;
         final Resources res = mContext.getResources();
@@ -544,7 +542,6 @@ public class TabletStatusBar extends BaseStatusBar implements
         mNavBarView.setDisabledFlags(mDisabled);
         mNavBarView.setBar(this);
         mNavBarView.getSearchLight().setOnTouchListener(mHomeSearchActionListener);
-        mAwesomeAction = new AwesomeAction(mContext);
 
         LayoutTransition lt = new LayoutTransition();
         lt.setDuration(250);
@@ -724,6 +721,18 @@ public class TabletStatusBar extends BaseStatusBar implements
         mWindowManager.updateViewLayout(mStatusBarView, lp);
     }
 
+    @Override
+    protected void onBarTouchEvent(MotionEvent ev) {
+    }
+
+    @Override
+    protected void showBar(boolean showSearch){
+    }
+
+    @Override
+    protected void setSearchLightOn(boolean on){
+    }
+
     private int mShowSearchHoldoff = 0;
     private Runnable mShowSearchPanel = new Runnable() {
         public void run() {
@@ -754,7 +763,7 @@ public class TabletStatusBar extends BaseStatusBar implements
         public void run() {
                 doubleClickCounter = 0;
                 animateCollapsePanels();
-                mAwesomeAction.launchAction(mClockActions[shortClick]);
+                AwesomeAction.launchAction(mContext, mClockActions[shortClick]);
         }
     };
 
@@ -771,7 +780,7 @@ public class TabletStatusBar extends BaseStatusBar implements
                     mHandler.removeCallbacks(DelayShortPress);
                     v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                     animateCollapsePanels();
-                    mAwesomeAction.launchAction(mClockActions[doubleClick]);
+                    AwesomeAction.launchAction(mContext, mClockActions[doubleClick]);
                     mHandler.postDelayed(ResetDoubleClickCounter, 50);
                 } else {
                     doubleClickCounter = doubleClickCounter + 1;
@@ -781,7 +790,7 @@ public class TabletStatusBar extends BaseStatusBar implements
             } else {
                 v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 animateCollapsePanels();
-                mAwesomeAction.launchAction(mClockActions[shortClick]);
+                AwesomeAction.launchAction(mContext, mClockActions[shortClick]);
             }
         }
     };
@@ -791,7 +800,7 @@ public class TabletStatusBar extends BaseStatusBar implements
         public boolean onLongClick(View v) {
             animateCollapsePanels();
             v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-            mAwesomeAction.launchAction(mClockActions[longClick]);
+            AwesomeAction.launchAction(mContext, mClockActions[longClick]);
             return true;
         }
     };

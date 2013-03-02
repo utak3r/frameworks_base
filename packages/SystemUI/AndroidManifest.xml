@@ -15,6 +15,7 @@
     <uses-permission android:name="android.permission.STATUS_BAR_SERVICE" />
     <uses-permission android:name="android.permission.STATUS_BAR" />
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.REMOTE_AUDIO_PLAYBACK" />
 
     <uses-permission android:name="android.permission.MANAGE_USERS" />
@@ -132,6 +133,12 @@
             <intent-filter>
                 <action android:name="com.android.systemui.recent.action.PRELOAD" />
                 <action android:name="com.android.systemui.recent.action.CANCEL_PRELOAD" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".aokp.AwesomeReceiver">
+            <intent-filter>
+                <action android:name="com.android.systemui.aokp.LAUNCH_ACTION" />
             </intent-filter>
         </receiver>
 

@@ -182,6 +182,8 @@ public final class PowerManager {
      * </p><p>
      * Since not all devices have proximity sensors, use {@link #isWakeLockLevelSupported}
      * to determine whether this wake lock level is supported.
+     * </p><p>
+     * Cannot be used with {@link #ACQUIRE_CAUSES_WAKEUP}.
      * </p>
      *
      * {@hide}
@@ -599,6 +601,24 @@ public final class PowerManager {
     public void reboot(String reason) {
         try {
             mService.reboot(false, reason, true);
+        } catch (RemoteException e) {
+        }
+    }
+
+    /**
+     * Boost the CPU. Boosts the cpu for the given duration in microseconds.
+     * Requires the {@link android.Manifest.permission#CPU_BOOST} permission.
+     *
+     * @param duration in microseconds to boost the CPU
+     *
+     * @hide
+     */
+    public void cpuBoost(int duration)
+    {
+        try {
+            if (mService != null) {
+                mService.cpuBoost(duration);
+            }
         } catch (RemoteException e) {
         }
     }
