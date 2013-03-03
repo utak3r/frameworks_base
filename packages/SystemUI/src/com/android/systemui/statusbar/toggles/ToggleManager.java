@@ -384,9 +384,9 @@ public class ToggleManager {
             boolean vibt = false;
             boolean silt = false;
             boolean sst = false;
-//            if (mUserToggles.contains(VIBRATE_TOGGLE)) {
-//               vibt = true;
-//            }
+            if (mUserToggles.contains(VIBRATE_TOGGLE)) {
+                vibt = true;
+            }
             if (mUserToggles.contains(SILENT_TOGGLE)) {
                 silt = true;
             }
