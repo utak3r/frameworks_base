@@ -2218,6 +2218,14 @@ public final class Settings {
         public static final String POINTER_LOCATION = "pointer_location";
 
         /**
+         * Show icon when stylus is used?
+         * 0 = no
+         * 1 = yes
+         * @hide
+         */
+        public static final String STYLUS_ICON_ENABLED = "stylus_icon_enabled";
+
+        /**
          * Show touch positions on screen?
          * 0 = no
          * 1 = yes
@@ -2578,7 +2586,6 @@ public final class Settings {
         };
 
         /**
-
          * Custom navring icons
          *
          * @hide
