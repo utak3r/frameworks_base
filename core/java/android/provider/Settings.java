@@ -2754,7 +2754,19 @@ public final class Settings {
          */
         public static final String NAVIGATION_BAR_SHOW_NOW = "navigation_bar_show_now";
 
-	/**
+        /**
+         * Used as a flag to determine if we have statusbar hidden
+         * @hide
+         */
+        public static final String STATUSBAR_HIDDEN = "statusbar_hidden";
+        
+        /**
+         * Statusbar toggle for quick settings
+         * &hide
+         */
+        public static final String STATUSBAR_QUICK_TOGGLE = "statusbar_quick_toggle";
+
+    	  /**
          * Show the NavBar dialog in Power menu
          * @hide
          */
@@ -4993,6 +5005,12 @@ public final class Settings {
          * @hide
          */
         public static final String SCREENSAVER_DEFAULT_COMPONENT = "screensaver_default_component";
+
+        /**
+         * If screensavers are enabled, whether the screensaver should be automatically launched
+         * when charging wirelessly.
+         */
+        public static final String SCREENSAVER_ACTIVATE_ON_WIRELESS_CHARGE = "screensaver_activate_on_wireless_charger";
 
         /**
          * This are the settings to be backed up.
